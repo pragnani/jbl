@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+
+	<!-- This is the good practice to scan whole application , here we are excluding 
+		Controllers because they are already Registered in dispatcher servlet. -->
+	<context:component-scan base-package="com.hospo.hub">
+
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- This is the main part, as we are providing the parameters required 
+		to connect to the database This is "jdbc:mysql://localhost:3306/employees" 
+		connection string, it will be different for you /employees is my schema name -->
+
+	<bean id="emf"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="packagesToScan" value="com.hospo.hub.beans" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+			</props>
+		</property>
+		<property name="persistenceProvider">
+			<bean class="org.hibernate.jpa.HibernatePersistenceProvider" />
+		</property>
+	</bean>
+
+	<jdbc:embedded-database id="dataSource" type="HSQL" />
+
+	<util:properties id="test">
+		<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+		<prop key="hibernate.show_sql">true</prop>
+		<prop key="hibernate.hbm2ddl.auto">update</prop>
+	</util:properties>
+
+	<import resource="Spring-beans.xml" />
+	<import resource="security.xml" />
+</beans>
